@@ -15,36 +15,52 @@ const todosIdsState = atom({
   default: [],
 });
 
-const tasksCompleteState = selector({
-  key: 'tasksComplete',
-  get: ({ get }) => {
-    const taskIds = get(todosIdsState)
-    const tasks = taskIds.map((id) => {
-      return get(todosFamily(id))
-    })
-    return tasks.filter((task) => task.isDone).length
-  },
-})
 
-const tasksRemainingState = selector({
-  key: 'tasksRemaining',
-  get: ({ get }) => {
-    const taskIds = get(todosIdsState)
-    const tasks = taskIds.map((id) => {
-      return get(todosFamily(id))
-    })
-    return tasks.filter((task) => !task.isDone).length
-  },
-})
 
+const Header = () => {
+
+  const tasksCompleteState = selector({
+    key: 'tasksComplete',
+    get: ({ get }) => {
+      const taskIds = get(todosIdsState)
+      const tasks = taskIds.map((id) => {
+        return get(todosFamily(id))
+      })
+      return tasks.filter((task) => task.isDone).length
+    },
+  })
+
+  const tasksRemainingState = selector({
+    key: 'tasksRemaining',
+    get: ({ get }) => {
+      const taskIds = get(todosIdsState)
+      const tasks = taskIds.map((id) => {
+        return get(todosFamily(id))
+      })
+      return tasks.filter((task) => !task.isDone).length
+    },
+  })
+
+  const tasksComplete = useRecoilValue(tasksCompleteState)
+  const tasksRemaining = useRecoilValue(tasksRemainingState)
+
+  const todosIds = useRecoilValue(todosIdsState)
+
+  return (
+    <p>
+      {todosIds?.length
+        ? `UnDone/Total todos ratio: ${tasksRemaining}/${tasksComplete + tasksRemaining}`
+        : "Add your  first task "}
+    </p>
+  )
+
+}
 
 const App = () => {
 
   const [filter, setFilter] = useState("all")
 
   const [todosIds, setTodosIds] = useRecoilState(todosIdsState)
-  const tasksComplete = useRecoilValue(tasksCompleteState)
-  const tasksRemaining = useRecoilValue(tasksRemainingState)
 
   const insertTask = useRecoilCallback(({ set }) => {
     return (title: string) => {
@@ -117,11 +133,7 @@ const App = () => {
 
   return (
     <>
-      <p>
-        {todosIds?.length
-          ? `UnDone/Total todos ratio: ${tasksRemaining}/${tasksComplete + tasksRemaining}`
-          : "Add your  first task "}
-      </p>
+      <Header />
       <ul>
         {todosIds
           .map((todoId) => (

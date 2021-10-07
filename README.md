@@ -16,30 +16,25 @@ const todosIdsState = atom({
   default: [],
 })
 
-const tasksCompleteState = selector({
-  key: 'tasksComplete',
-  get: ({ get }) => {
-    const taskIds = get(todosIdsState)
-    const tasks = taskIds.map((id) => {
-      return get(todosFamily(id))
-    })
-    return tasks.filter((task) => task.isDone).length
-  },
-})
-
-const tasksRemainingState = selector({
-  key: 'tasksRemaining',
-  get: ({ get }) => {
-    const taskIds = get(todosIdsState)
-    const tasks = taskIds.map((id) => {
-      return get(todosFamily(id))
-    })
-    return tasks.filter((task) => !task.isDone).length
-  },
-})
-
 ...
+ const [todosIds, setTodosIds] = useRecoilState(todosIdsState)
+ ...
 
-const tasksComplete = useRecoilValue(tasksCompleteState)
-const tasksRemaining = useRecoilValue(tasksRemainingState)
+const deleteTodo = React.useCallback(
+  function (id) {
+    return function (e) {
+      setTodosIds((prevIds) => {
+        const index = prevIds.findIndex((currentId) => currentId === id)
+
+        let newIds = [...prevIds]
+        if (index >= 0) {
+          newIds.splice(index, 1)
+        }
+        console.log(' deleteTodo - newIds: ', newIds)
+        return newIds
+      })
+    }
+  },
+  [setTodosIds]
+)
 ```
